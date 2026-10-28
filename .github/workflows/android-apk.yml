@@ -31,9 +31,9 @@ jobs:
             ~/.gradle/caches
             ~/.gradle/wrapper
             ~/.android
-          key: android-build-${{ runner.os }}-${{ hashFiles('buildozer.spec', 'requirements-core.txt', '.github/workflows/android-apk.yml') }}
+          key: android-build-v2-${{ runner.os }}-${{ hashFiles('buildozer.spec', 'requirements-core.txt', '.github/workflows/android-apk.yml') }}
           restore-keys: |
-            android-build-${{ runner.os }}-
+            android-build-v2-${{ runner.os }}-
       - name: Instalar dependencias del sistema
         run: |
           sudo apt-get update
