@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+*.so
+.venv/
+venv/
+env/
+
+# Packaging / builds
+build/
+dist/
+*.spec
+bin/
+.gradle/
+.buildozer/
+.python-version
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Test inputs and generated output
+tests/data/private/
+output/
