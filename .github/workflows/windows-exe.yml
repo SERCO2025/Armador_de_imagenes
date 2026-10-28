@@ -1,0 +1,33 @@
+name: Compilar EXE de Windows
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-2022
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+      - name: Configurar Python 3.7.9 de 64 bits
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.7.9"
+          architecture: "x64"
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade "pip<24.1"
+          python -m pip install -r requirements-core.txt
+          python -m pip install "kivy==2.1.0" "pyinstaller==5.13.2"
+      - name: Compilar aplicación
+        run: |
+          python -m PyInstaller --noconfirm --clean --onefile --windowed --name ArmadorDeImagenes --collect-all kivy --collect-all PIL main.py
+      - name: Publicar EXE como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: ArmadorDeImagenes-Windows-x64-Python-3.7.9
+          path: dist/ArmadorDeImagenes.exe
+          if-no-files-found: error
+          retention-days: 14
