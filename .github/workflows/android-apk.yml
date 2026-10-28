@@ -12,12 +12,28 @@ jobs:
     steps:
       - name: Descargar repositorio
         uses: actions/checkout@v4
-      # Python del host construye el paquete. El runtime Python de Android
-      # lo prepara python-for-android; no es el Python del runner.
+      # pip cache guarda paquetes descargados; .buildozer conserva SDK/NDK,
+      # herramientas y partes de compilaciones reutilizables.
       - name: Configurar Python de construcción
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
+          cache: pip
+          cache-dependency-path: |
+            buildozer.spec
+            requirements-core.txt
+            .github/workflows/android-apk.yml
+      - name: Restaurar caché de Android y Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            .buildozer
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.android
+          key: android-build-${{ runner.os }}-${{ hashFiles('buildozer.spec', 'requirements-core.txt', '.github/workflows/android-apk.yml') }}
+          restore-keys: |
+            android-build-${{ runner.os }}-
       - name: Instalar dependencias del sistema
         run: |
           sudo apt-get update
