@@ -10,6 +10,8 @@ Aplicación para Windows de 64 bits y Android destinada a recortar automáticame
 - Encontrar la zona de solapamiento y alinear las capturas antes de unirlas.
 - Mostrar una vista previa para revisar y corregir uniones dudosas.
 - Guardar una imagen final por pareja, sin modificar los originales.
+- Ofrecer la unión original y una copia de impresión de 8.5 pulgadas de ancho a 300 ppp (2550 píxeles de ancho, altura proporcional).
+- Permitir comparar vistas previas de la unión original, la ampliación convencional y una variante opcional con superresolución por IA antes de guardar.
 - Informar de parejas incompletas, coincidencias insuficientes y errores.
 
 ## Plataformas objetivo
@@ -28,7 +30,9 @@ Consulta [el plan técnico](docs/PLAN_TECNICO.md) para conocer la arquitectura p
 ## Principios
 
 - Mantener intactos los archivos originales.
-- Evitar remuestreo y suavizado innecesarios.
+- Evitar remuestreo y suavizado innecesarios en la unión base.
+- Mantener separadas las variantes ampliadas y la salida original.
+- No asumir que el suavizado o la IA mejoran siempre el texto de las capturas; permitir inspeccionar las diferencias antes de guardar.
 - No recortar contenido útil al detectar márgenes negros.
 - No aceptar silenciosamente uniones dudosas.
 - Separar la lógica de procesamiento de la interfaz para reutilizarla en ambas plataformas.
