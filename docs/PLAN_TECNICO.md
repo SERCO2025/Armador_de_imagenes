@@ -44,7 +44,23 @@ Clasificar los resultados como:
 
 La aplicación no debe ocultar errores ni presentar como correcta una unión que no haya podido verificar.
 
-## 6. Procesamiento por lotes y seguridad
+## 6. Exportación, tamaño físico y mejora opcional
+
+Después de unir y revisar cada pareja, la aplicación debe ofrecer tres variantes comparables, sin alterar el resultado base:
+
+1. **Unión original**: guardar la composición con sus dimensiones en píxeles tal como quedó después del recorte y ensamblado, sin ampliación ni suavizado. Registrar 300 ppp solo si el usuario lo elige; cambiar los metadatos de ppp por sí solo no aumenta el detalle ni los píxeles.
+2. **Tamaño de impresión 8.5 pulgadas a 300 ppp**: generar una copia de 2550 píxeles de ancho, con altura calculada proporcionalmente para conservar la relación de aspecto y asignar metadatos de 300 ppp. La ampliación convencional debe ser una opción diferenciada y no debe sobrescribir la unión original.
+3. **Ampliación con superresolución por IA**: permitir generar una variante usando un modelo como Real-ESRGAN y después ajustar el resultado al ancho final de 2550 píxeles si hace falta. Debe ser opcional; los modelos de IA pueden inventar o modificar detalles finos, incluidos caracteres, líneas y pequeños símbolos.
+
+Antes de guardar, mostrar vistas previas comparables de la unión original, la copia preparada para 8.5 pulgadas/300 ppp y la variante procesada por IA. Permitir ampliar la vista para inspeccionar texto pequeño y bordes. La vista previa no debe sustituir ni modificar el archivo base.
+
+- Conservar la proporción original; nunca estirar la imagen para alcanzar un tamaño fijo de alto.
+- Guardar el resultado de la unión sin pérdida, preferentemente PNG, para evitar artefactos JPEG en texto y bordes.
+- Mantener los originales y la unión base intactos; guardar cada variante por separado.
+- Tratar Windows 7 y Android como destinos separados al evaluar el motor de IA: verificar arquitectura, requisitos de GPU/Vulkan, memoria, tamaño de modelos, licencia y compatibilidad real antes de integrarlo.
+- No prometer que una imagen será más fiel solo por tener más píxeles. El usuario debe poder comparar la variante con IA contra la original antes de aceptarla.
+
+## 7. Procesamiento por lotes y seguridad
 
 - Leer los originales sin modificarlos.
 - Escribir resultados en una carpeta de salida separada.
@@ -52,7 +68,7 @@ La aplicación no debe ocultar errores ni presentar como correcta una unión que
 - Permitir repetir el proceso sin sobrescribir originales.
 - Controlar el uso de memoria para carpetas grandes.
 
-## 7. Compatibilidad de plataformas
+## 8. Compatibilidad de plataformas
 
 ### Windows 7 de 64 bits
 
@@ -62,7 +78,7 @@ La compatibilidad con Windows 7 condiciona la selección de Python, Kivy y bibli
 
 El empaquetado Android requiere verificar que las dependencias del núcleo puedan compilarse e instalarse con la cadena de herramientas Android elegida. La selección de archivos debe funcionar con los mecanismos de almacenamiento disponibles en las versiones de Android que se decidan soportar.
 
-## 8. Fases propuestas
+## 9. Fases propuestas
 
 1. Crear pruebas del emparejamiento por nombres.
 2. Implementar y probar detección de franjas negras con anchos variables.
@@ -73,7 +89,7 @@ El empaquetado Android requiere verificar que las dependencias del núcleo pueda
 7. Empaquetar y probar Windows 7 de 64 bits.
 8. Empaquetar y probar Android.
 
-## 9. Decisiones pendientes
+## 10. Decisiones pendientes
 
 - Versión mínima de Android.
 - Confirmar si el usuario necesita conservar exactamente el formato original de las capturas o si el resultado puede guardarse en PNG.
