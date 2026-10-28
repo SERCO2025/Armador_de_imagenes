@@ -6,6 +6,7 @@ package.domain = mx.serco2025
 source.dir = .
 source.include_exts = py,png,jpg,jpeg,kv,atlas
 version = 0.1.0
+p4a.branch = master
 requirements = python3,kivy==2.1.0,pillow==9.5.0,numpy
 orientation = portrait
 fullscreen = 0
