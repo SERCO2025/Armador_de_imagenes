@@ -21,6 +21,10 @@ Aplicación para Windows de 64 bits y Android destinada a recortar automáticame
 
 La compatibilidad real con Windows 7 y las versiones de Android se verificará con compilaciones y pruebas específicas; no se dará por garantizada solo por compartir código.
 
+## Funcionamiento sin internet
+
+La aplicación deberá funcionar completamente sin conexión después de instalarse. Todo el procesamiento, las vistas previas, la exportación y cualquier mejora por IA compatible se ejecutarán localmente. Los modelos y componentes necesarios se incluirán en el paquete; no se descargarán durante el uso ni se enviarán imágenes a servicios externos. Se probará con Wi-Fi y datos móviles desactivados.
+
 ## Estado
 
 Proyecto recién iniciado. La estructura y los criterios técnicos se documentarán antes de incorporar algoritmos de ensamblado o afirmar que hay una versión funcional.
