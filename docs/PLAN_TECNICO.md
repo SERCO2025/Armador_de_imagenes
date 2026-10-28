@@ -76,6 +76,8 @@ Antes de guardar, mostrar vistas previas comparables de la unión original, la c
 - Permitir repetir el proceso sin sobrescribir originales.
 - Controlar el uso de memoria para carpetas grandes.
 
+Consulta también la [matriz preliminar de dependencias](MATRIZ_DEPENDENCIAS.md). Sus versiones son candidatas y no deben considerarse validadas hasta pasar las pruebas indicadas.
+
 ## 8. Compatibilidad de plataformas
 
 ### Windows 7 de 64 bits
