@@ -16,7 +16,7 @@ Aplicación para Windows de 64 bits y Android destinada a recortar automáticame
 
 ## Plataformas objetivo
 
-- **Windows 7 de 64 bits**: requisito de compatibilidad prioritario para la versión de escritorio.
+- **Windows 7 de 64 bits**: requisito de compatibilidad prioritario para la versión de escritorio. Se usará **Python 3.7.9 de 64 bits** como versión de referencia y se fijarán dependencias compatibles.
 - **Android**: aplicación con el mismo flujo de trabajo, adaptado a pantalla táctil.
 
 La compatibilidad real con Windows 7 y las versiones de Android se verificará con compilaciones y pruebas específicas; no se dará por garantizada solo por compartir código.
