@@ -80,9 +80,11 @@ Antes de guardar, mostrar vistas previas comparables de la unión original, la c
 
 ### Windows 7 de 64 bits
 
-La compatibilidad con Windows 7 condiciona la selección de Python, Kivy y bibliotecas binarias. Se debe fijar una combinación de versiones compatible y probarla en Windows 7 real o en una máquina virtual antes de elegirla como versión de producción. No actualizar dependencias a ciegas si eso rompe el soporte de Windows 7.
+**Versión de Python acordada: 3.7.9 de 64 bits.** Esta versión será la referencia del entorno de desarrollo para priorizar la compatibilidad con Windows 7. Todas las dependencias deben fijarse en versiones que admitan Python 3.7.9 y Windows 7; no se deben instalar automáticamente las versiones más recientes sin verificar su compatibilidad. Se debe probar el paquete final en Windows 7 real o en una máquina virtual.
 
 ### Android
+
+Python 3.7.9 es la versión de referencia acordada para el desarrollo, pero no se debe asumir que ese mismo entorno puede empaquetarse en Android sin ajustes. Habrá que verificar una cadena de compilación compatible, dependencias binarias, arquitectura y versión mínima de Android. Si se necesita una configuración distinta para Android, el núcleo de procesamiento deberá conservar compatibilidad funcional y pruebas compartidas.
 
 El empaquetado Android requiere verificar que las dependencias del núcleo puedan compilarse e instalarse con la cadena de herramientas Android elegida. La selección de archivos debe funcionar con los mecanismos de almacenamiento disponibles en las versiones de Android que se decidan soportar.
 
