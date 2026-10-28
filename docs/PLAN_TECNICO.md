@@ -1,5 +1,13 @@
 # Plan técnico — Armador de Imágenes
 
+## Requisito obligatorio: funcionamiento sin conexión
+
+La aplicación debe funcionar completamente sin internet después de instalarse. El procesamiento de imágenes, la detección de solapamientos, la exportación, las vistas previas y cualquier mejora por IA deben ejecutarse localmente en el dispositivo. No se permiten servicios web, APIs remotas, cuentas, telemetría obligatoria ni descargas de modelos durante el uso normal.
+
+Todos los ejecutables, bibliotecas, recursos y modelos necesarios se deben incluir en el instalador o paquete de la aplicación, o instalarse desde un paquete local distribuido junto con ella. El primer arranque y todas las funciones deben seguir funcionando con Wi-Fi y datos móviles desactivados. La descarga de herramientas para preparar el instalador puede requerir internet en el equipo de desarrollo, pero la aplicación instalada no debe necesitarlo.
+
+La función de superresolución por IA solo se incluirá si el modelo y su motor pueden empaquetarse y ejecutarse localmente en Windows 7 de 64 bits y Android, con las licencias verificadas. Si un motor no es compatible con una plataforma, no se debe sustituir por un servicio en línea: se ofrecerá un método local compatible o se desactivará esa opción en esa plataforma.
+
 ## 1. Estrategia de arquitectura
 
 Mantener tres capas separadas:
