@@ -19,6 +19,8 @@ jobs:
         with:
           python-version: "3.7.9"
           architecture: "x64"
+          cache: pip
+          cache-dependency-path: requirements-core.txt
       - name: Instalar dependencias del núcleo
         run: |
           python -m pip install --upgrade "pip<24.1"
