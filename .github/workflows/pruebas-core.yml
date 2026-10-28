@@ -9,16 +9,20 @@ on:
 
 jobs:
   pruebas:
-    runs-on: ubuntu-22.04
+    # setup-python publica Python 3.7.9 para Windows, pero no para Ubuntu.
+    runs-on: windows-2022
     steps:
       - name: Descargar repositorio
         uses: actions/checkout@v4
-      - name: Configurar Python 3.7.9
+      - name: Configurar Python 3.7.9 de 64 bits
         uses: actions/setup-python@v5
         with:
           python-version: "3.7.9"
+          architecture: "x64"
       - name: Instalar dependencias del núcleo
-        run: python -m pip install --upgrade "pip<24.1" && python -m pip install -r requirements-core.txt
+        run: |
+          python -m pip install --upgrade "pip<24.1"
+          python -m pip install -r requirements-core.txt
       - name: Ejecutar pruebas
         env:
           PYTHONPATH: src
