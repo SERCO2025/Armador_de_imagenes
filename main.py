@@ -41,6 +41,7 @@ if _SOURCE_DIR not in sys.path:
 
 from armador.core import (
     pair_images, find_vertical_overlap, stitch_vertical,
+    detect_side_borders, crop_side_borders,
 )
 
 
@@ -61,6 +62,8 @@ class ArmadorRoot(BoxLayout):
         self.bottom_image = None
         self.joined_image = None
         self.overlap_slider = None
+        self.pair_index = -1
+        self._pending_border_crop = None
 
         self.add_widget(Label(
             text="[b]Armador de Imágenes[/b]",
@@ -114,6 +117,7 @@ class ArmadorRoot(BoxLayout):
         self.add_widget(self.slider_row)
 
         actions = BoxLayout(size_hint_y=None, height=dp(42), spacing=dp(5))
+        actions.add_widget(_button("Detectar bordes", self.propose_border_crop, 42))
         actions.add_widget(_button("Detectar solapamiento", self.detect_overlap, 42))
         actions.add_widget(_button("Guardar unión PNG", self.save_join, 42))
         self.add_widget(actions)
@@ -235,6 +239,9 @@ class ArmadorRoot(BoxLayout):
                 # make the mode explicit so the core can paste safely.
                 bottom = bottom.convert(top.mode)
             self.current_pair = pair
+            self.pair_index = next((i for i, candidate in enumerate(
+                self.scan_result["pairs"] if self.scan_result else [])
+                if candidate == pair), self.pair_index)
             self.top_image = top.copy()
             self.bottom_image = bottom.copy()
             self.joined_image = None
@@ -253,6 +260,90 @@ class ArmadorRoot(BoxLayout):
             self.detect_overlap()
         except Exception as exc:
             self._message("No se pudieron abrir las capturas", str(exc))
+
+
+    def propose_border_crop(self, *_args):
+        if self.top_image is None or self.bottom_image is None:
+            self.footer.text = "Primero selecciona una pareja."
+            return
+        try:
+            top_bounds = detect_side_borders(self.top_image)
+            bottom_bounds = detect_side_borders(self.bottom_image)
+            top_removed = (top_bounds[0], self.top_image.width - top_bounds[1])
+            bottom_removed = (bottom_bounds[0], self.bottom_image.width - bottom_bounds[1])
+            if top_bounds == (0, self.top_image.width) and bottom_bounds == (
+                    0, self.bottom_image.width):
+                self._message(
+                    "Sin bordes detectados",
+                    "No se encontraron bordes laterales oscuros suficientemente uniformes. "
+                    "No se modificó ninguna imagen."
+                )
+                return
+            if top_bounds[1] - top_bounds[0] != bottom_bounds[1] - bottom_bounds[0]:
+                self._message(
+                    "Recorte no aplicado",
+                    "Los recortes propuestos dejarían anchos diferentes: captura 1 = %d px; "
+                    "captura 2 = %d px. No se aplicó el recorte para evitar deformar o "
+                    "desplazar contenido. Revisa las imágenes manualmente."
+                    % (top_bounds[1] - top_bounds[0],
+                       bottom_bounds[1] - bottom_bounds[0])
+                )
+                return
+            self._pending_border_crop = (top_bounds, bottom_bounds)
+            body = BoxLayout(orientation="vertical", padding=dp(12), spacing=dp(8))
+            message = (
+                "Propuesta de recorte lateral (sin escalar):\n\n"
+                "Captura 1: quitar %d px izquierda y %d px derecha.\n"
+                "Captura 2: quitar %d px izquierda y %d px derecha.\n\n"
+                "¿Aplicar estos recortes a la vista de trabajo? Los archivos originales "
+                "seguirán intactos."
+                % (top_removed[0], top_removed[1], bottom_removed[0], bottom_removed[1])
+            )
+            label = Label(text=message, halign="left", valign="middle")
+            label.bind(size=self._fit_label)
+            body.add_widget(label)
+            controls = BoxLayout(size_hint_y=None, height=dp(44), spacing=dp(8))
+            popup = Popup(title="Revisar bordes", content=body,
+                          size_hint=(0.92, 0.55), auto_dismiss=False)
+            controls.add_widget(_button("Cancelar", lambda *_: popup.dismiss(), 44))
+
+            def apply_crop(*_args):
+                bounds = self._pending_border_crop
+                if not bounds:
+                    popup.dismiss()
+                    return
+                self.top_image = crop_side_borders(self.top_image, bounds[0])
+                self.bottom_image = crop_side_borders(self.bottom_image, bounds[1])
+                self._pending_border_crop = None
+                self.joined_image = None
+                self.selection_label.text = "%s — bordes recortados: %dx%d + %dx%d" % (
+                    self.current_pair["base_name"],
+                    self.top_image.width, self.top_image.height,
+                    self.bottom_image.width, self.bottom_image.height
+                )
+                self.overlap_slider.max = max(
+                    1, min(self.top_image.height, self.bottom_image.height) - 1
+                )
+                self.overlap_slider.value = min(
+                    self.overlap_slider.value, self.overlap_slider.max
+                )
+                self.detect_overlap()
+                popup.dismiss()
+                self.footer.text = "Recorte aplicado solo a la copia de trabajo; originales intactos."
+
+            controls.add_widget(_button("Aplicar recorte", apply_crop, 44))
+            body.add_widget(controls)
+            popup.open()
+        except Exception as exc:
+            self._message("No se pudieron detectar los bordes", str(exc))
+
+    def next_pair(self, *_args):
+        pairs = self.scan_result["pairs"] if self.scan_result else []
+        if not pairs:
+            self.footer.text = "Analiza una carpeta y selecciona una pareja primero."
+            return
+        next_index = (self.pair_index + 1) % len(pairs)
+        self.select_pair(pairs[next_index])
 
     def detect_overlap(self, *_args):
         if self.top_image is None or self.bottom_image is None:
