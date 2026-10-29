@@ -6,6 +6,6 @@ setup(
     description="Motor local para recortar y unir capturas sin remuestreo.",
     package_dir={"": "src"},
     packages=find_packages("src"),
-    python_requires=">=3.7,<3.8",
+    python_requires=">=3.7,<3.9",
     install_requires=["Pillow==9.5.0", "numpy==1.21.6"],
 )
