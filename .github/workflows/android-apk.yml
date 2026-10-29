@@ -2,7 +2,7 @@ name: Compilar APK de Android
 
 on:
   push:
-    branches: [main]
+    branches: [main, fase1-emparejamiento]
   workflow_dispatch:
 
 jobs:
