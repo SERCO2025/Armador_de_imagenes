@@ -24,15 +24,9 @@ from kivy.uix.scrollview import ScrollView
 from kivy.uix.slider import Slider
 from kivy.uix.textinput import TextInput
 
-try:
-    from android.permissions import request_permissions, Permission
-    request_permissions([
-        Permission.READ_EXTERNAL_STORAGE,
-        Permission.WRITE_EXTERNAL_STORAGE,
-    ])
-except (ImportError, Exception):
-    pass
-
+# En Android no solicitar permisos durante la importación del módulo.
+# Hacerlo antes de que Kivy/SDL2 termine de inicializar puede provocar un
+# cambio de foco durante el arranque y cerrar el proceso nativo.
 # The app runs from the repository root on Windows and from the APK package
 # root on Android. Add src explicitly so the same core module works in both.
 _SOURCE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "src")
@@ -139,6 +133,27 @@ class ArmadorRoot(BoxLayout):
         widget.text_size = (max(0, widget.width - dp(8)), None)
 
     def choose_folder(self, *_args):
+        # Solicitar acceso al almacenamiento solo cuando el usuario lo necesita.
+        # Así evitamos abrir el diálogo Android mientras SDL2 está arrancando.
+        try:
+            from android.permissions import request_permissions, Permission
+            request_permissions(
+                [
+                    Permission.READ_EXTERNAL_STORAGE,
+                    Permission.WRITE_EXTERNAL_STORAGE,
+                ],
+                self._on_storage_permissions,
+            )
+            return
+        except ImportError:
+            # Ejecución de escritorio: no existe el módulo android.
+            pass
+        self._open_folder_chooser()
+
+    def _on_storage_permissions(self, _permissions, _grants):
+        self._open_folder_chooser()
+
+    def _open_folder_chooser(self):
         start = self.folder_input.text.strip() or os.path.expanduser("~")
         if not os.path.isdir(start):
             start = os.path.expanduser("~")
