@@ -5,8 +5,84 @@ como propuestas para que la interfaz pueda pedir confirmación cuando haga falta
 """
 from __future__ import division
 
+import os
+import re
+
 from PIL import Image
 import numpy as np
+
+
+SUPPORTED_IMAGE_EXTENSIONS = frozenset((
+    ".png", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff", ".webp",
+))
+
+
+def pair_images(paths):
+    """Empareja capturas llamadas Nombre 1.ext y Nombre 2.ext.
+
+    Devuelve un diccionario con cuatro listas: pairs, incomplete, ambiguous
+    y unmatched. La comparación del nombre base no distingue mayúsculas.
+    No elige arbitrariamente si hay más de un candidato para una misma mitad.
+    Los resultados propuestos usan PNG para evitar pérdidas en texto y bordes;
+    esta función no lee ni modifica archivos.
+    """
+    groups = {}
+    unmatched = []
+    for path in sorted(paths, key=lambda value: str(value).lower()):
+        filename = os.path.basename(str(path))
+        stem, extension = os.path.splitext(filename)
+        if extension.lower() not in SUPPORTED_IMAGE_EXTENSIONS:
+            continue
+        match = re.match(r"^(.+?)\s+([12])$", stem)
+        if not match:
+            unmatched.append(str(path))
+            continue
+
+        base_name = match.group(1).strip()
+        if not base_name:
+            unmatched.append(str(path))
+            continue
+        key = base_name.casefold()
+        if key not in groups:
+            groups[key] = {
+                "base_name": base_name,
+                "top": [],
+                "bottom": [],
+            }
+        side = "top" if match.group(2) == "1" else "bottom"
+        groups[key][side].append(str(path))
+
+    result = {
+        "pairs": [],
+        "incomplete": [],
+        "ambiguous": [],
+        "unmatched": unmatched,
+    }
+    for key in sorted(groups):
+        group = groups[key]
+        top = group["top"]
+        bottom = group["bottom"]
+        if len(top) > 1 or len(bottom) > 1:
+            result["ambiguous"].append({
+                "base_name": group["base_name"],
+                "top_candidates": list(top),
+                "bottom_candidates": list(bottom),
+                "reason": "Hay más de un archivo candidato para una mitad.",
+            })
+        elif not top or not bottom:
+            result["incomplete"].append({
+                "base_name": group["base_name"],
+                "missing_part": "top" if not top else "bottom",
+                "available_files": list(top or bottom),
+            })
+        else:
+            result["pairs"].append({
+                "base_name": group["base_name"],
+                "top": top[0],
+                "bottom": bottom[0],
+                "output_name": group["base_name"] + ".png",
+            })
+    return result
 
 
 def detect_side_borders(image, black_threshold=18, row_fraction=0.985,
