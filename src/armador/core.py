@@ -50,6 +50,8 @@ def pair_images(paths):
                 "bottom": [],
             }
         side = "top" if match.group(2) == "1" else "bottom"
+        if side == "top":
+            groups[key]["base_name"] = base_name
         groups[key][side].append(str(path))
 
     result = {
