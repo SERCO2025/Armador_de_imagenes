@@ -40,27 +40,47 @@ jobs:
         run: |
           python -m pip install --upgrade pip setuptools wheel
           python -m pip install "Cython==0.29.36" "buildozer==1.5.0"
+      - name: Preparar ubicación del Android SDK para Buildozer
+        run: |
+          SDK_ROOT="$HOME/.buildozer/android/platform/android-sdk"
+          mkdir -p "$SDK_ROOT"
+          echo "ANDROID_SDK_ROOT=$SDK_ROOT" >> "$GITHUB_ENV"
+          echo "ANDROID_HOME=$SDK_ROOT" >> "$GITHUB_ENV"
+      - name: Instalar herramientas Android
+        uses: android-actions/setup-android@v3
+        with:
+          cmdline-tools-version: 11076708
+          packages: platform-tools
       - name: Instalar y verificar Android SDK Platform 31
         run: |
           set -euo pipefail
-          SDK_ROOT="$HOME/.buildozer/android/platform/android-sdk"
-          SDKMANAGER="$SDK_ROOT/tools/bin/sdkmanager"
+          SDK_ROOT="$ANDROID_SDK_ROOT"
+          SDKMANAGER_REAL="$SDK_ROOT/cmdline-tools/12.0/bin/sdkmanager"
+          SDKMANAGER_COMPAT="$SDK_ROOT/tools/bin/sdkmanager"
 
-          if [ ! -x "$SDKMANAGER" ]; then
-            echo "::error::No se encontró sdkmanager en $SDKMANAGER"
-            find "$SDK_ROOT" -maxdepth 5 -type f -name sdkmanager -print || true
+          if [ ! -x "$SDKMANAGER_REAL" ]; then
+            echo "::error::No se encontró sdkmanager en $SDKMANAGER_REAL"
+            find "$SDK_ROOT" -maxdepth 6 -type f -name sdkmanager -print || true
             exit 1
           fi
 
-          yes | "$SDKMANAGER" --sdk_root="$SDK_ROOT" --licenses
-          "$SDKMANAGER" --sdk_root="$SDK_ROOT" \
-            "platform-tools" \
+          # Buildozer 1.5.0 todavía busca sdkmanager en tools/bin.
+          # Este wrapper conserva el SDK moderno en cmdline-tools/12.0.
+          mkdir -p "$SDK_ROOT/tools/bin"
+          cat > "$SDKMANAGER_COMPAT" <<EOF
+          #!/usr/bin/env bash
+          exec "$SDKMANAGER_REAL" "\$@"
+          EOF
+          chmod +x "$SDKMANAGER_COMPAT"
+
+          "$SDKMANAGER_COMPAT" --sdk_root="$SDK_ROOT" \
             "platforms;android-31" \
             "build-tools;31.0.0"
 
           test -d "$SDK_ROOT/platforms/android-31"
           test -x "$SDK_ROOT/platform-tools/adb"
-          echo "Android SDK Platform 31 instalada y verificada."
+          test -x "$SDKMANAGER_COMPAT"
+          echo "Android SDK Platform 31 y compatibilidad Buildozer verificadas."
       - name: Compilar APK de depuración
         env:
           JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
