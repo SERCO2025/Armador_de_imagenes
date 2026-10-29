@@ -2,22 +2,21 @@ name: Pruebas del núcleo
 
 on:
   push:
-    branches: [main]
+    branches: [main, fix/android-startup]
   pull_request:
     branches: [main]
   workflow_dispatch:
 
 jobs:
   pruebas:
-    # setup-python publica Python 3.7.9 para Windows, pero no para Ubuntu.
     runs-on: windows-2022
     steps:
       - name: Descargar repositorio
         uses: actions/checkout@v4
-      - name: Configurar Python 3.7.9 de 64 bits
+      - name: Configurar Python 3.8.10 de 64 bits
         uses: actions/setup-python@v5
         with:
-          python-version: "3.7.9"
+          python-version: "3.8.10"
           architecture: "x64"
           cache: pip
           cache-dependency-path: requirements-core.txt
