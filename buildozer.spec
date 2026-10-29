@@ -11,7 +11,7 @@ source.exclude_dirs = .git,.github,.buildozer,bin,build,dist,tests,docs,__pycach
 version = 0.1.0
 # Commit fijado con recetas compatibles con Python 3.11: Kivy 2.3.0,
 # NumPy 1.26.5 y Pillow 10.3.0.
-p4a.branch = 3d69b695e76f04ca9e9cedda4f9414e201d43983
+p4a.branch = v2024.01.21
 # Dejar que python-for-android seleccione las versiones de sus recetas compatibles
 # con el Python que realmente construye para Android (3.11 en la compilación 15).
 requirements = python3,kivy,pillow,numpy
