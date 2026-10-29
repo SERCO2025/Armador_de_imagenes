@@ -40,6 +40,27 @@ jobs:
         run: |
           python -m pip install --upgrade pip setuptools wheel
           python -m pip install "Cython==0.29.36" "buildozer==1.5.0"
+      - name: Instalar y verificar Android SDK Platform 31
+        run: |
+          set -euo pipefail
+          SDK_ROOT="$HOME/.buildozer/android/platform/android-sdk"
+          SDKMANAGER="$SDK_ROOT/tools/bin/sdkmanager"
+
+          if [ ! -x "$SDKMANAGER" ]; then
+            echo "::error::No se encontró sdkmanager en $SDKMANAGER"
+            find "$SDK_ROOT" -maxdepth 5 -type f -name sdkmanager -print || true
+            exit 1
+          fi
+
+          yes | "$SDKMANAGER" --sdk_root="$SDK_ROOT" --licenses
+          "$SDKMANAGER" --sdk_root="$SDK_ROOT" \
+            "platform-tools" \
+            "platforms;android-31" \
+            "build-tools;31.0.0"
+
+          test -d "$SDK_ROOT/platforms/android-31"
+          test -x "$SDK_ROOT/platform-tools/adb"
+          echo "Android SDK Platform 31 instalada y verificada."
       - name: Compilar APK de depuración
         env:
           JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
