@@ -10,6 +10,14 @@ import io
 import os
 import sys
 import traceback
+# PyInstaller --windowed puede dejar stdout/stderr como None.
+# Kivy inicializa su logger durante el import y necesita streams escribibles.
+# Solo sustituirlos cuando no existen; no alterar la consola ni Android.
+if sys.stdout is None:
+    sys.stdout = open(os.devnull, "w")
+if sys.stderr is None:
+    sys.stderr = open(os.devnull, "w")
+
 
 from kivy.app import App
 from kivy.core.image import Image as CoreImage
