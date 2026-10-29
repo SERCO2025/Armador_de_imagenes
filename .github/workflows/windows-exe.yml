@@ -2,7 +2,7 @@ name: Compilar EXE de Windows
 
 on:
   push:
-    branches: [main]
+    branches: [main, fase1-emparejamiento]
   workflow_dispatch:
 
 jobs:
