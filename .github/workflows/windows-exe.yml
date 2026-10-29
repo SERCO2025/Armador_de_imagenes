@@ -2,7 +2,7 @@ name: Compilar EXE de Windows
 
 on:
   push:
-    branches: [main, fase1-emparejamiento]
+    branches: [main, fase1-emparejamiento, fix/android-startup]
   workflow_dispatch:
 
 jobs:
@@ -12,10 +12,10 @@ jobs:
     steps:
       - name: Descargar repositorio
         uses: actions/checkout@v4
-      - name: Configurar Python 3.7.9 de 64 bits
+      - name: Configurar Python 3.8.10 de 64 bits
         uses: actions/setup-python@v5
         with:
-          python-version: "3.7.9"
+          python-version: "3.8.10"
           architecture: "x64"
           cache: pip
           cache-dependency-path: |
@@ -32,7 +32,7 @@ jobs:
       - name: Publicar EXE como artefacto
         uses: actions/upload-artifact@v4
         with:
-          name: ArmadorDeImagenes-Windows-x64-Python-3.7.9
+          name: ArmadorDeImagenes-Windows-x64-Python-3.8.10
           path: dist/ArmadorDeImagenes.exe
           if-no-files-found: error
           retention-days: 14
