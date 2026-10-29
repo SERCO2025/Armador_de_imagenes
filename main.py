@@ -117,9 +117,10 @@ class ArmadorRoot(BoxLayout):
         self.add_widget(self.slider_row)
 
         actions = BoxLayout(size_hint_y=None, height=dp(42), spacing=dp(5))
-        actions.add_widget(_button("Detectar bordes", self.propose_border_crop, 42))
-        actions.add_widget(_button("Detectar solapamiento", self.detect_overlap, 42))
-        actions.add_widget(_button("Guardar unión PNG", self.save_join, 42))
+        actions.add_widget(_button("Bordes", self.propose_border_crop, 42))
+        actions.add_widget(_button("Solapamiento", self.detect_overlap, 42))
+        actions.add_widget(_button("Guardar PNG", self.save_join, 42))
+        actions.add_widget(_button("Siguiente", self.next_pair, 42))
         self.add_widget(actions)
 
         self.preview = KivyImage(
