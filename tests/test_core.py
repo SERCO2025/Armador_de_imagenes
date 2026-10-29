@@ -1,7 +1,51 @@
 import unittest
 from PIL import Image, ImageDraw
 
-from armador.core import detect_side_borders, crop_side_borders, find_vertical_overlap, stitch_vertical
+from armador.core import (
+    pair_images, detect_side_borders, crop_side_borders,
+    find_vertical_overlap, stitch_vertical,
+)
+
+
+class PairingTests(unittest.TestCase):
+    def test_pairs_files_and_proposes_png_output(self):
+        result = pair_images(["capturas/Arizona 2.png", "capturas/Arizona 1.png"])
+        self.assertEqual(len(result["pairs"]), 1)
+        self.assertEqual(result["pairs"][0], {
+            "base_name": "Arizona",
+            "top": "capturas/Arizona 1.png",
+            "bottom": "capturas/Arizona 2.png",
+            "output_name": "Arizona.png",
+        })
+        self.assertEqual(result["incomplete"], [])
+        self.assertEqual(result["ambiguous"], [])
+
+    def test_pairing_is_case_insensitive_and_accepts_common_extensions(self):
+        result = pair_images(["Arizona 1.JPG", "arizona 2.jpeg"])
+        self.assertEqual(len(result["pairs"]), 1)
+        self.assertEqual(result["pairs"][0]["output_name"], "Arizona.png")
+
+    def test_reports_missing_half_instead_of_guessing(self):
+        result = pair_images(["Arizona 1.png", "Nevada 2.png"])
+        self.assertEqual(result["incomplete"], [
+            {"base_name": "Arizona", "missing_part": "bottom",
+             "available_files": ["Arizona 1.png"]},
+            {"base_name": "Nevada", "missing_part": "top",
+             "available_files": ["Nevada 2.png"]},
+        ])
+        self.assertEqual(result["pairs"], [])
+
+    def test_reports_duplicate_candidates_as_ambiguous(self):
+        result = pair_images([
+            "Arizona 1.png", "Arizona 1.jpg", "Arizona 2.png",
+        ])
+        self.assertEqual(len(result["ambiguous"]), 1)
+        self.assertEqual(len(result["ambiguous"][0]["top_candidates"]), 2)
+        self.assertEqual(result["pairs"], [])
+
+    def test_unmatched_image_names_are_reported(self):
+        result = pair_images(["captura_suelta.png", "notas.txt"])
+        self.assertEqual(result["unmatched"], ["captura_suelta.png"])
 
 
 class CoreTests(unittest.TestCase):
@@ -29,7 +73,6 @@ class CoreTests(unittest.TestCase):
         draw = ImageDraw.Draw(top)
         draw.rectangle((5, 30, 60, 50), fill="black")
         bottom = top.crop((0, 40, 80, 100))
-        # Both input images are required to have equal width; matching is bounded.
         result = find_vertical_overlap(top, bottom, min_overlap=10, max_overlap=50, stride=1)
         self.assertIn("overlap_pixels", result)
         self.assertIn("needs_review", result)
