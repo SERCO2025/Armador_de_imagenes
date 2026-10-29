@@ -10,7 +10,9 @@ source.include_patterns = src/armador/*.py
 source.exclude_dirs = .git,.github,.buildozer,bin,build,dist,tests,docs,__pycache__
 version = 0.1.0
 p4a.branch = v2024.01.21
-requirements = python3,kivy==2.1.0,pillow==9.5.0,numpy==1.22.3
+# Dejar que python-for-android seleccione las versiones de sus recetas compatibles
+# con el Python que realmente construye para Android (3.11 en la compilación 15).
+requirements = python3,kivy,pillow,numpy
 orientation = portrait
 fullscreen = 0
 
