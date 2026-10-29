@@ -8,7 +8,7 @@ on:
 jobs:
   build-windows:
     runs-on: windows-2022
-    timeout-minutes: 20
+    timeout-minutes: 35
     steps:
       - name: Descargar repositorio
         uses: actions/checkout@v4
@@ -27,6 +27,8 @@ jobs:
           python -m pip install -r requirements-core.txt
           python -m pip install "kivy==2.1.0" "pyinstaller==5.13.2"
       - name: Compilar aplicación
+        env:
+          KIVY_GL_BACKEND: angle_sdl2
         run: |
           python -m PyInstaller --noconfirm --clean --onefile --windowed --name ArmadorDeImagenes --collect-data kivy --collect-binaries kivy --collect-all PIL main.py
       - name: Publicar EXE como artefacto
